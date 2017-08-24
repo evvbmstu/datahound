@@ -13,7 +13,7 @@ def getAllMembers( fields, groupId ):
     members       = []
     groupLen      = vk_api.groups.getMembers( group_id = groupId ).get( 'count', 0 )
     
-    while ( len(members) < groupLen):
+    while ( len(members) < groupLen ):
         token  = "?access_token={0}".format( workToken )
         fields = "&fields={0}".format( fields )
         args   = "&groupId={0}&membersLen={1}&groupLen={2}".format( groupId, len(members), groupLen)
