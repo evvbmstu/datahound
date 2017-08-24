@@ -1,8 +1,6 @@
 
 # coding: utf-8
 
-# In[9]:
-
 import json
 import requests
 
@@ -16,10 +14,10 @@ def getAllMembers( fields, groupId ):
     while ( len(members) < groupLen ):
         token  = "?access_token={0}".format( workToken )
         fields = "&fields={0}".format( fields )
-        args   = "&groupId={0}&membersLen={1}&groupLen={2}".format( groupId, len(members), groupLen)
+        args   = "&groupId={0}&membersLen={1}&groupLen={2}".format( groupId, len( members ), groupLen)
         #
         try:
-            info = requests.post( baseUrl + procedureName + args).json()
+            info = requests.post( baseUrl + procedureName + args ).json()
         except requests.exceptions.RequestException as error:
             print ( error )
         
