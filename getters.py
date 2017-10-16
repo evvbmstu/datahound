@@ -13,8 +13,9 @@ def auth():
     return vk_api
 
 
-def get_members(group_id, group_len, fields=ss.MEMBERS_FIELDS, ):
+def get_members(group_id, group_len, fields=ss.MEMBERS_FIELDS, debug=False):
     """
+    :param debug: Debug mode on/off
     :param group_len: Members count
     :param fields: For example - sex,b_date,city.
     :param group_id: Group name.For example - bmstuinformer
@@ -41,12 +42,13 @@ def get_members(group_id, group_len, fields=ss.MEMBERS_FIELDS, ):
             return error
         # Use the get() method to avoid use try/catch for KeyError exception
         members += info.get('response', 'empty')
-        print("Get:" + str(len(members)))
+        if debug:
+            print("Get:" + str(len(members)))
 
     return members
 
 
-def get_posts(group_id, wall_len):
+def get_posts(group_id, wall_len, debug=False):
     posts = []
     proc_name = "getAllPosts"
     domain_arg = "&domain={0}".format(group_id)
@@ -61,5 +63,8 @@ def get_posts(group_id, wall_len):
             return error
 
         posts += info.get('response', 'empty')
+        if debug:
+            print("Get:" + str(len(posts)))
+
     return posts
 
