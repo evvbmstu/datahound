@@ -43,7 +43,7 @@ def get_members(group_id, group_len, fields=ss.MEMBERS_FIELDS, debug=False):
         # Use the get() method to avoid use try/catch for KeyError exception
         members += info.get('response', 'empty')
         if debug:
-            print("Get:" + str(len(members)))
+            print("Get members:" + str(len(members)))
 
     return members
 
@@ -64,7 +64,7 @@ def get_posts(group_id, wall_len, debug=False):
 
         posts += info.get('response', 'empty')
         if debug:
-            print("Get:" + str(len(posts)))
+            print("Get posts:" + str(len(posts)))
 
     return posts
 

@@ -6,9 +6,11 @@ import community as cm
 import funnelview
 print("Just start app.")
 app = dash.Dash()
-pb = cm.Community("darcor")
+pb = cm.Community("knndev")
 data = pb.sex_dist(debug="True")
+print("We got all members sex")
 funnel = pb.likes_funnel(debug=True)
+print(" Okay, we got data for plot lieks funnel")
 phase = ["Views", "Likes", 'Reposts']
 values = []
 for each in phase:
