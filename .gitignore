@@ -39,7 +39,7 @@ Thumbs.db
 
 # Jupyter notebook #
 ######################
-*.ipynb
+#*.ipynb #
 
 # Local settings #
 ######################
