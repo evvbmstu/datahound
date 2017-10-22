@@ -2,7 +2,8 @@ import getters
 import settings
 # import pandas as pd
 from collections import Counter
-
+from math import floor, log
+import numpy as np
 
 class Community:
     def __init__(self, group_id):
@@ -48,8 +49,23 @@ class Community:
         platform_dict = {}
         for each in index_dict.keys():
             platform_dict[settings.PLATFORM[each]] = index_dict[each]
-        return platform_dict
 
+        platform_dict.update({'Apple': platform_dict['iPhone'] + platform_dict['iPad']})
+        platform_dict.pop('iPhone')
+        platform_dict.pop('iPad')
+
+        to_pop = platform_dict.get('Windows 10', 0)
+        platform_dict['Web'] += to_pop
+        if to_pop:
+            platform_dict.pop('Windows 10')
+
+        system_dict = dict.fromkeys(['Web', 'Mobile'])
+        system_dict['Web'] = platform_dict['Web']
+        platform_dict.pop('Web')
+        system_dict['Mobile'] = platform_dict['Mobile']
+        platform_dict.pop('Mobile')
+
+        return platform_dict, system_dict
 
     def likes_funnel(self, debug=False):
         posts = getters.get_posts(self.group_id, self.posts_count, debug)
@@ -74,6 +90,43 @@ class Community:
                         'Reposts': reposts, 'Reposts_past': reposts_past}
         return funnel_value
 
+    def age_dict(self, debug=False):
+        age_data = getters.get_members(self.group_id, self.members_count, debug=debug, fields='sex, bdate')
+        year = 2017
+        unknown = 0
+        ages_male = []
+        ages_female = []
+        for user in age_data:
+            date = user.get('bdate', None)
+            if date:
+                date = date.split('.')
+                if len(date) < 3:
+                    unknown += 1
+                    continue
+                else:
+                    date = date[-1]
+                    age = year - int(date)
+                    if age >= 80 or age < 10:
+                        unknown += 1
+                    else:
+                        if user['sex'] == 1:  # female
+                            ages_female.append(age)
+                        if user['sex'] == 2:  # male
+                            ages_male.append(age)
+
+        # print(np.histogram(ages, bins='sturges'))
+        age_female_max = max(ages_female)
+        age_female_min = min(ages_female)
+        age_male_max = max(ages_male)
+        age_male_min = min(ages_female)
+        age_num = len(ages_female) + len(ages_male)
+
+        hist_step = 1 + floor(log(age_num, 2))
+        # age_dict = {(a, a + hist_step): None for a in range(age_min, age_max, hist_step)}
+        xbins_female = dict(start=age_female_min, end=age_female_max, size=hist_step)
+        xbins_male = dict(start=age_male_min, end=age_male_max, size=hist_step)
+        return ages_female, xbins_female, ages_male, xbins_male, unknown
+
     def display(self):
         print("ID:" + str(self.group_id))
         print("Members:" + str(self.members_count))
@@ -81,8 +134,8 @@ class Community:
 
 
 if __name__ == "__main__":
-    pb = Community("r_pics")
-    print(pb.sex_dist())
-    print(pb.platform_dist())
-    print(pb.likes_funnel())
+    pb = Community("sbertech")
+    pb.age_dict()
+    # print(pb.platform_dist())
+    # print(pb.likes_funnel())
 
