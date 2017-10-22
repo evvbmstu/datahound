@@ -23,11 +23,13 @@ def get_members(group_id, group_len, fields=ss.MEMBERS_FIELDS, debug=False):
     """
     members = []  # List for members info.
     proc_name = "getAllMembers"  # Name of stored procedure in VK app
+
     # Fields, which we can get from users.
     fields_arg = "&fields={0}".format(fields)
     token_arg = "?access_token={0}".format(ss.TOKEN)
     group_arg = "&groupLen={0}".format(group_len)
     id_arg = "&groupId={0}".format(group_id)
+
     # Concatenate all together and get link to post request
     post_url = ss.BASE_URL + proc_name + token_arg + fields_arg + group_arg + id_arg
     if group_len == 0:
@@ -40,11 +42,11 @@ def get_members(group_id, group_len, fields=ss.MEMBERS_FIELDS, debug=False):
             info = requests.post(post_url + proc_args).json()
         except requests.exceptions.RequestException as error:
             return error
+
         # Use the get() method to avoid use try/catch for KeyError exception
         members += info.get('response', 'empty')
         if debug:
             print("Get members:" + str(len(members)))
-
     return members
 
 
