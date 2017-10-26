@@ -62,6 +62,7 @@ def create_platform_dist(community):
     pie_system = [go.Pie(labels=list(system.keys()), values=list(system.values()),
                          hoverinfo='label+percent', textinfo='value',
                          marker=dict(colors=['#8B8386', '#FFE4C4']), opacity=0.9)]
+
     return pie_platform, pie_system
 
 
