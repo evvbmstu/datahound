@@ -1,9 +1,13 @@
-import getters
-import settings
 # import pandas as pd
 from collections import Counter
 from math import floor, log
-import numpy as np
+
+import getters
+import settings
+
+
+# import numpy as np
+
 
 class Community:
     def __init__(self, group_id):
@@ -11,6 +15,10 @@ class Community:
         self.members_count, self.posts_count = self.counters()
         # self.posts, self.posts_count = getters.get_posts(group_id)
         # self.members, self.members_count = getters.get_members(group_id,fields='sex')
+
+    # def database_check(self):
+        # conn = MySQLdb.connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWD, MYSQL_DB, charset='utf8', use_unicode=True)
+        # cursor = conn.cursor()
 
     def counters(self):
         vk_api = getters.auth()
@@ -135,7 +143,7 @@ class Community:
 
 if __name__ == "__main__":
     pb = Community("sbertech")
-    pb.age_dict()
+    # pb.age_dict()
     # print(pb.platform_dist())
     # print(pb.likes_funnel())
 
