@@ -1,12 +1,12 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import plotly.graph_objs as go
+
 import community as cm
-import funnelview
+import views
 
 
-def create_dash_app(comm_name="bmstuinformer", debug=True):
+def create_dash_app(comm_name="rhymes", debug=True):
     if debug:
             print("Just start app.")
     app = dash.Dash()
@@ -18,11 +18,10 @@ def create_dash_app(comm_name="bmstuinformer", debug=True):
 
     if debug:
         print("Okey, we got some data. Start to visualize...")
-
-    sex_dist = create_sex_dist(pb)
-    funnel = create_likes_funnel(pb)
-    platform_dist, system_dist = create_platform_dist(pb)
-    fig_sex_age = create_ages_gist(pb)
+    sex_dist = views.create_sex_dist(pb)
+    funnel = views.create_likes_funnel(pb)
+    platform_dist, system_dist = views.create_platform_dist(pb)
+    fig_sex_age = views.create_ages_gist(pb)
 
     app.layout = html.Div(children=[
         html.H1(children='Hello Dash'),
@@ -95,7 +94,6 @@ def create_likes_funnel(community):
     for each in phase:
         values.append(funnel[each])
     return funnelview.funnel_fig(values, phase)
-
 
 if __name__ == '__main__':
     create_dash_app()
