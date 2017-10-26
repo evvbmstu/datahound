@@ -41,7 +41,7 @@ class Community:
         sex_dict = {"Woman": woman, "Man": man, "Unknown": unknown}
         return sex_dict
 
-    def platform_dist(self):
+    def platform_dist(self, debug=False):
         platform_data = getters.get_members(self.group_id, self.members_count, fields="last_seen")
         platform_count = []
 

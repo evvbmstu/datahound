@@ -3,25 +3,27 @@ import plotly.graph_objs as go
 import funnelview
 
 
-def create_sex_dist(community):
-    sex = community.sex_dist(debug=True)
-    return [go.Pie(labels=list(sex.keys()), values=list(sex.values()))]
+class CreatorViews:
+    @staticmethod
+    def pie_chart(data, colors, name):
+        return [go.Pie(labels=list(data.keys()), values=list(data.values()),
+                       hoverinfo='label+percent', textinfo='value',
+                       marker=dict(colors=colors), name=name, opacity=0.9)]
+
+    @staticmethod
+    def histogram(data, xbins, colors, name):
+        return go.Histogram(x=data, histnorm='percent', xbins=xbins,
+                            marker=dict(color=colors, ), name=name,
+                            opacity=0.75)
+
+    @staticmethod
+    def _store_2_fig(first, second):
+        pass
 
 
-def create_platform_dist(community):
-    platform, system = community.platform_dist()
-    pie_platform = [go.Pie(
-                        labels=list(platform.keys()), values=list(platform.values()),
-                        hoverinfo='label+percent', textinfo='value',
-                        marker=dict(colors=['#66CDAA', '#EE5C42', '#1874CD']), opacity=0.9)]
-    pie_system = [go.Pie(
-                        labels=list(system.keys()), values=list(system.values()),
-                        hoverinfo='label+percent', textinfo='value',
-                        marker=dict(colors=['#8B8386', '#FFE4C4']), opacity=0.9)]
-    return pie_platform, pie_system
 
 
-def create_ages_gist(community):
+def ages_gist(community):
     ages_female, xbins_female, ages_male, xbins_male, ukn = community.age_dict()
     gist_female = go.Histogram(
                             x=ages_female, histnorm='percent', xbins=xbins_female,
@@ -45,7 +47,7 @@ def create_ages_gist(community):
     return go.Figure(data=[gist_female, gist_male], layout=layout)
 
 
-def create_likes_funnel(community):
+def likes_funnel(community):
     funnel = community.likes_funnel(debug=True)
 
     phase = ["Views", "Likes", 'Reposts']
