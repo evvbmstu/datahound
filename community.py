@@ -41,6 +41,21 @@ class Community:
         sex_dict = {"Woman": woman, "Man": man, "Unknown": unknown}
         return sex_dict
 
+    def ad_ratio(self):
+        posts = getters.get_posts(self.group_id, self.posts_count)
+        ad = 0
+        no_ad = 0
+        unknown = 0
+        for post in posts:
+            if post['marked_as_ads'] == 0:
+                no_ad += 1
+            elif post['marked_as_ads'] == 1:
+                ad += 1
+            else:
+                unknown += 1
+        ad_ratio = {'marked as ad': ad, 'not ad': no_ad, 'unknown': unknown}
+        return ad_ratio
+
     def platform_dist(self):
         platform_data = getters.get_members(self.group_id, self.members_count, fields="last_seen")
         platform_count = []
@@ -142,8 +157,8 @@ class Community:
 
 
 if __name__ == "__main__":
-    pb = Community("sbertech")
-    # pb.age_dict()
-    # print(pb.platform_dist())
-    # print(pb.likes_funnel())
+    pb = Community("bmstuinformer")
+    pb.age_dict()
+    print(pb.platform_dist())
+    print(pb.likes_funnel())
 
