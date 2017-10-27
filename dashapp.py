@@ -6,7 +6,7 @@ import community as cm
 import views
 
 
-def create_dash_app(comm_name="rhymes", debug=True):
+def create_dash_app(comm_name="bmstuinformer", debug=True):
     if debug:
             print("Just start app.")
     app = dash.Dash()
@@ -22,6 +22,7 @@ def create_dash_app(comm_name="rhymes", debug=True):
     funnel = views.create_likes_funnel(pb)
     platform_dist, system_dist = views.create_platform_dist(pb)
     fig_sex_age = views.create_ages_gist(pb)
+    ad_ratio = views.create_ad_ratio(pb)
 
     app.layout = html.Div(children=[
         html.H1(children='Hello Dash'),
@@ -38,7 +39,9 @@ def create_dash_app(comm_name="rhymes", debug=True):
 
         dcc.Graph(id='System', figure={'data': system_dist}),
 
-        dcc.Graph(id='Ages', figure={'data': fig_sex_age})
+        dcc.Graph(id='Ages', figure={'data': fig_sex_age}),
+
+        dcc.Graph(id='Ad', figure={'data': ad_ratio})
 
     ])
 

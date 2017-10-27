@@ -2,6 +2,9 @@ import plotly.graph_objs as go
 
 import funnelview
 
+def create_ad_ratio(community):
+    ad_ = community.ad_ratio()
+    return [go.Pie(labels=list(ad_.keys()), values=list(ad_.values()))]
 
 def create_sex_dist(community):
     sex = community.sex_dist(debug=True)
