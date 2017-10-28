@@ -19,6 +19,7 @@ SEX_COLORS = ['#FFD7E9', '#6495ED', '#B22222']
 PLATFORM_COLORS = ['#66CDAA', '#EE5C42', '#B22222', '#1874CD']
 SYSTEM_COLORS = ['#8B8386', '#FFE4C4']
 ```
+:collision: To get your token please visit [Получение ключа доступа](https://vk.com/dev/access_token)
 
 :collision: Run `pip3 install -r requirements.txt` to install all dependencies at once.
 
