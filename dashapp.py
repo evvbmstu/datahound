@@ -10,31 +10,35 @@ class CommunityAnalysisApp:
     def __init__(self, name="pentestit", debug=True, start=False):
         self.debug = debug
         self.community_name = name
+        self.app = dash.Dash()
+        self.public = None
         if start:
-            self.start()
+            self._start()
 
-    def start(self):
+    def _start(self):
         if self.debug:
                 print("Just start app.")
-        app = dash.Dash()
-        pb = cm.Community(self.community_name)
+
+        self.public = cm.Community(self.community_name)
+
         if self.debug:
             print("We got info of community")
 
-        pb.display()
+        self.public.display()
 
+    def get_diagrams(self):
         if self.debug:
             print("Okey, we got some data. Start to visualize...")
-        sex_pie = vws.pie_chart(pb.sex_dist(), ['#F08080', '#6495ED',  '#B22222'], 'Sex')
+        sex_pie = vws.pie_chart(self.public.sex_dist(), ['#F08080', '#6495ED', '#B22222'], 'Sex')
 
-        funnel = vws.funnel(["Views", "Likes", 'Reposts'], pb.likes_funnel(debug=True))
+        funnel = vws.funnel(["Views", "Likes", 'Reposts'], self.public.likes_funnel(debug=True))
 
-        plat_data, sys_data = pb.platform_dist()
+        plat_data, sys_data = self.public.platform_dist()
 
         platform_pie = vws.pie_chart(plat_data, ['#66CDAA', '#EE5C42', '#1874CD', '#B22222'], 'Platform')
         system_pie = vws.pie_chart(sys_data, ['#8B8386', '#FFE4C4'], 'System')
 
-        ages_female, xbins_female, ages_male, xbins_male, ukn = pb.age_dict()
+        ages_female, xbins_female, ages_male, xbins_male, ukn = self.public.age_dict()
 
         gist_female = vws.histogram(ages_female, xbins_female, '#FFD7E9', 'Female')
         gist_male = vws.histogram(ages_male, xbins_male, '#6495ED', 'Male')
@@ -48,7 +52,9 @@ class CommunityAnalysisApp:
 
         fig_sex_age = vws.store_2_fig(gist_female, gist_male, lay)
 
-        app.layout = html.Div(children=[
+        # TODO divide it to generate_data() and generate_html()
+
+        self.app.layout = html.Div(children=[
             html.H1(children='Analisys of {0}'.format(self.community_name)),
 
             dcc.Graph(id='Sex', figure={'data': sex_pie}),
@@ -63,12 +69,17 @@ class CommunityAnalysisApp:
 
         ])
 
+    def run(self):
+        self.get_diagrams()
+
         if self.debug:
             print("We draw this awesome graph, bro. Check it.")
 
-        app.run_server(debug=True)
+        self.app.run_server(debug=True)
 
 
 if __name__ == '__main__':
-    nya = CommunityAnalysisApp(start=True)
+    pub = CommunityAnalysisApp(start=True)
+    pub.run()
+
 
