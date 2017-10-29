@@ -3,50 +3,86 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 import community as cm
-import views
+import views as vws
+import settings as st
 
 
-def create_dash_app(comm_name="rhymes", debug=True):
-    if debug:
-            print("Just start app.")
-    app = dash.Dash()
-    pb = cm.Community(comm_name)
-    if debug:
-        print("We got info of community")
+class CommunityAnalysisApp:
+    def __init__(self, name="pentestit", debug=True, start=False):
+        self.debug = debug
+        self.community_name = name
+        self.app = dash.Dash()
+        self.public = None
+        if start:
+            self._start()
 
-    pb.display()
+    def _start(self):
+        if self.debug:
+                print("Just start app.")
 
-    if debug:
-        print("Okey, we got some data. Start to visualize...")
-    sex_dist = views.create_sex_dist(pb)
-    funnel = views.create_likes_funnel(pb)
-    platform_dist, system_dist = views.create_platform_dist(pb)
-    fig_sex_age = views.create_ages_gist(pb)
+        self.public = cm.Community(self.community_name)
 
-    app.layout = html.Div(children=[
-        html.H1(children='Hello Dash'),
+        if self.debug:
+            print("We got info of community")
 
-        html.Div(children='''
-            Dash: A web application framework for Python.
-        '''),
+        self.public.display()
 
-        dcc.Graph(id='Sex', figure={'data': sex_dist}),
+    def get_diagrams(self):
+        if self.debug:
+            print("Okey, we got some data. Start to visualize...")
+        sex_pie = vws.pie_chart(self.public.sex_dist(), st.SEX_COLORS, 'Sex')
 
-        dcc.Graph(id='Likes funnel', figure={'data': funnel[0], 'layout': funnel[1]}),
+        funnel = vws.funnel(["Views", "Likes", 'Reposts'], self.public.likes_funnel(debug=True))
 
-        dcc.Graph(id='Plaform', figure={'data': platform_dist}),
+        plat_data, sys_data = self.public.platform_dist()
 
-        dcc.Graph(id='System', figure={'data': system_dist}),
+        print(plat_data.keys())
 
-        dcc.Graph(id='Ages', figure={'data': fig_sex_age})
+        platform_pie = vws.pie_chart(plat_data, ['#66CDAA', '#EE5C42', '#B22222', '#1874CD'], 'Platform')
+        system_pie = vws.pie_chart(sys_data, st.SYSTEM_COLORS, 'System')
 
-    ])
+        ages_female, xbins_female, ages_male, xbins_male, ukn = self.public.age_dict()
 
-    if debug:
-        print("We draw this awesome graph, bro. Check it.")
+        gist_female = vws.histogram(ages_female, xbins_female, st.SEX_COLORS[0], 'Female')
+        gist_male = vws.histogram(ages_male, xbins_male, st.SEX_COLORS[1], 'Male')
 
-    app.run_server(debug=False)
+        max_age = max(xbins_female['end'], xbins_male['end'])
+        step = xbins_female['size']
+        labels = ['{0}'.format(a) for a in range(0, max_age + step, step)]
+        values = [a for a in range(0, max_age + step, step)]
+
+        lay = vws.layout('Sex/Age', labels, values, 'Age ({0} Uknown)'.format(ukn), 'Percent')
+
+        fig_sex_age = vws.store_2_fig(gist_female, gist_male, lay)
+
+        # TODO divide it to generate_data() and generate_html()
+
+        self.app.layout = html.Div(children=[
+            html.H1(children='Analisys of {0}'.format(self.community_name)),
+
+            dcc.Graph(id='Sex', figure={'data': sex_pie}),
+
+            dcc.Graph(id='Likes funnel', figure={'data': funnel[0], 'layout': funnel[1]}),
+
+            dcc.Graph(id='Plaform', figure={'data': platform_pie}),
+
+            dcc.Graph(id='System', figure={'data': system_pie}),
+
+            dcc.Graph(id='Ages', figure={'data': fig_sex_age})
+
+        ])
+
+    def run(self):
+        self.get_diagrams()
+
+        if self.debug:
+            print("We draw this awesome graph, bro. Check it.")
+
+        self.app.run_server(debug=True)
 
 
 if __name__ == '__main__':
-    create_dash_app()
+    pub = CommunityAnalysisApp(start=True)
+    pub.run()
+
+
