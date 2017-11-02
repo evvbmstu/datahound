@@ -8,7 +8,7 @@ import settings as st
 
 
 class CommunityAnalysisApp:
-    def __init__(self, name="pentestit", debug=True, start=False):
+    def __init__(self, name="manmachtmarginalien", debug=True, start=False):
         self.debug = debug
         self.community_name = name
         self.app = dash.Dash()
@@ -36,6 +36,8 @@ class CommunityAnalysisApp:
 
         plat_data, sys_data = self.public.platform_dist()
 
+        ad_data = self.public.ad_ratio()
+
         print(plat_data.keys())
 
         platform_pie = vws.pie_chart(plat_data, ['#66CDAA', '#EE5C42', '#B22222', '#1874CD'], 'Platform')
@@ -55,6 +57,8 @@ class CommunityAnalysisApp:
 
         fig_sex_age = vws.store_2_fig(gist_female, gist_male, lay)
 
+        ad_ratio = vws.pie_chart(ad_data, st.SYSTEM_COLORS, 'Ad ratio')
+
         # TODO divide it to generate_data() and generate_html()
 
         self.app.layout = html.Div(children=[
@@ -68,7 +72,9 @@ class CommunityAnalysisApp:
 
             dcc.Graph(id='System', figure={'data': system_pie}),
 
-            dcc.Graph(id='Ages', figure={'data': fig_sex_age})
+            dcc.Graph(id='Ages', figure={'data': fig_sex_age}),
+
+            dcc.Graph(id='Ad ratio', figure={'data': ad_ratio})
 
         ])
 
