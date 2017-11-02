@@ -24,4 +24,9 @@ SYSTEM_COLORS = ['#8B8386', '#FFE4C4']
 :collision: Run `pip3 install -r requirements.txt` to install all dependencies at once.
 
 ### TODO List
-- TODO
+- Async
+- Data Base
+- Tests
+- ???
+
+````

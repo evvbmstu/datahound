@@ -5,6 +5,7 @@ import dash_html_components as html
 import community as cm
 import views as vws
 import settings as st
+import exceptions as exc
 
 
 class CommunityAnalysisApp:
@@ -30,18 +31,18 @@ class CommunityAnalysisApp:
     def get_diagrams(self):
         if self.debug:
             print("Okey, we got some data. Start to visualize...")
-        sex_pie = vws.pie_chart(self.public.sex_dist(), st.SEX_COLORS, 'Sex')
+        sex_pie = vws.pie_chart(self.public.sex_data(), st.SEX_COLORS, 'Sex')
 
-        funnel = vws.funnel(["Views", "Likes", 'Reposts'], self.public.likes_funnel(debug=True))
+        funnel = vws.funnel(["Views", "Likes", 'Reposts'], self.public.likes_data(debug=True))
 
-        plat_data, sys_data = self.public.platform_dist()
+        plat_data, sys_data = self.public.platform_data()
 
         print(plat_data.keys())
 
         platform_pie = vws.pie_chart(plat_data, ['#66CDAA', '#EE5C42', '#B22222', '#1874CD'], 'Platform')
         system_pie = vws.pie_chart(sys_data, st.SYSTEM_COLORS, 'System')
 
-        ages_female, xbins_female, ages_male, xbins_male, ukn = self.public.age_dict()
+        ages_female, xbins_female, ages_male, xbins_male, ukn = self.public.age_data()
 
         gist_female = vws.histogram(ages_female, xbins_female, st.SEX_COLORS[0], 'Female')
         gist_male = vws.histogram(ages_male, xbins_male, st.SEX_COLORS[1], 'Male')
@@ -82,7 +83,11 @@ class CommunityAnalysisApp:
 
 
 if __name__ == '__main__':
-    pub = CommunityAnalysisApp(start=True)
-    pub.run()
+    try:
+        pub = CommunityAnalysisApp(start=True)
+        pub.run()
+    except exc.VkAPIError:
+        print('Oops, get token, please')
+
 
 

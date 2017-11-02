@@ -26,7 +26,7 @@ class Community:
         posts_count = vk_api.wall.get(domain=self.group_id)[0]
         return members_count, posts_count
 
-    def sex_dist(self, debug=False):
+    def sex_data(self, debug=False):
         sex_data = getters.get_members(self.group_id, self.members_count, debug=debug, fields="sex")
         woman = 0
         man = 0
@@ -41,7 +41,7 @@ class Community:
         sex_dict = {"Woman": woman, "Man": man, "Unknown": unknown}
         return sex_dict
 
-    def platform_dist(self, debug=False):
+    def platform_data(self, debug=False):
         platform_data = getters.get_members(self.group_id, self.members_count, fields="last_seen")
         platform_count = []
 
@@ -75,7 +75,7 @@ class Community:
 
         return platform_dict, system_dict
 
-    def likes_funnel(self, debug=False):
+    def likes_data(self, debug=False):
         posts = getters.get_posts(self.group_id, self.posts_count, debug)
         views = 0
         likes = 0
@@ -98,7 +98,7 @@ class Community:
                         'Reposts': reposts, 'Reposts_past': reposts_past}
         return funnel_value
 
-    def age_dict(self, debug=False):
+    def age_data(self, debug=False):
         age_data = getters.get_members(self.group_id, self.members_count, debug=debug, fields='sex, bdate')
         year = 2017
         unknown = 0
@@ -130,7 +130,7 @@ class Community:
         age_num = len(ages_female) + len(ages_male)
 
         hist_step = 1 + floor(log(age_num, 2))
-        # age_dict = {(a, a + hist_step): None for a in range(age_min, age_max, hist_step)}
+        # age_data = {(a, a + hist_step): None for a in range(age_min, age_max, hist_step)}
         xbins_female = dict(start=age_female_min, end=age_female_max, size=hist_step)
         xbins_male = dict(start=age_male_min, end=age_male_max, size=hist_step)
         return ages_female, xbins_female, ages_male, xbins_male, unknown
@@ -143,7 +143,7 @@ class Community:
 
 if __name__ == "__main__":
     pb = Community("sbertech")
-    # pb.age_dict()
-    # print(pb.platform_dist())
-    # print(pb.likes_funnel())
+    # pb.age_data()
+    # print(pb.platform_data())
+    # print(pb.likes_data())
 

@@ -38,3 +38,33 @@ class ClientTestCase(unittest.TestCase):
 
         # If we want, we can check the contents of the response
         self.assertEqual(response_dict, expected_dict)
+
+
+class ViewersTestCase(unittest.TestCase):
+    def setUp(self):
+        self.api = auth()
+    pass
+
+
+class CommunityTestCase(unittest.TestCase):
+    def setUp(self):
+        self.api = auth()
+
+    def counters_test(self):
+        pass
+
+    def sex_data_test(self):
+        pass
+
+    def platform_data_test(self):
+        pass
+
+    def likes_data_test(self):
+        pass
+
+    def age_data_test(self):
+        pass
+
+
+if __name__ == '__main__':
+    pass
