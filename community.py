@@ -26,6 +26,21 @@ class Community:
         posts_count = self.vk_api.wall.get(domain=self.group_id)[0]
         return members_count, posts_count
 
+    def ad_data(self):
+        posts = getters.get_posts(self.group_id, self.posts_count)
+        ad = 0
+        no_ad = 0
+        unknown = 0
+        for post in posts:
+            if post['marked_as_ads'] == 0:
+                no_ad += 1
+            elif post['marked_as_ads'] == 1:
+                ad += 1
+            else:
+                unknown += 1
+        ad_data = {'marked as ad': ad, 'not ad': no_ad, 'unknown': unknown}
+        return ad_data
+
     def sex_data(self, debug=False):
         sex_data = getters.get_members(self.group_id, self.members_count, debug=debug, fields="sex")
         woman = 0

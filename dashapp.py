@@ -35,7 +35,11 @@ class CommunityAnalysisApp:
 
         funnel = vws.funnel(["Views", "Likes", 'Reposts'], self.public.likes_data(debug=True))
 
-        plat_data, sys_data = self.public.platform_data()
+        plat_data, sys_data = self.public.platform_dist()
+
+        ad_data = self.public.ad_ratio()
+
+        # print(plat_data.keys())
 
         platform_pie = vws.pie_chart(plat_data, ['#66CDAA', '#EE5C42', '#B22222', '#1874CD'], 'Platform')
         system_pie = vws.pie_chart(sys_data, st.SYSTEM_COLORS, 'System')
@@ -54,6 +58,8 @@ class CommunityAnalysisApp:
 
         fig_sex_age = vws.store_2_fig(gist_female, gist_male, lay)
 
+        ad_ratio = vws.pie_chart(ad_data, st.SYSTEM_COLORS, 'Ad ratio')
+
         # TODO divide it to generate_data() and generate_html()
 
         self.app.layout = html.Div(children=[
@@ -67,7 +73,9 @@ class CommunityAnalysisApp:
 
             dcc.Graph(id='System', figure={'data': system_pie}),
 
-            dcc.Graph(id='Ages', figure={'data': fig_sex_age})
+            dcc.Graph(id='Ages', figure={'data': fig_sex_age}),
+
+            dcc.Graph(id='Ad ratio', figure={'data': ad_ratio})
 
         ])
 
