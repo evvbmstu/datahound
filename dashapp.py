@@ -9,7 +9,7 @@ import exceptions as exc
 
 
 class CommunityAnalysisApp:
-    def __init__(self, name="pentestit", debug=True, start=False):
+    def __init__(self, name="manmachtmarginalien", debug=True, start=False):
         self.debug = debug
         self.community_name = name
         self.app = dash.Dash()
@@ -40,7 +40,7 @@ class CommunityAnalysisApp:
         ad_data = self.public.ad_ratio()
 
         # print(plat_data.keys())
-
+        
         platform_pie = vws.pie_chart(plat_data, ['#66CDAA', '#EE5C42', '#B22222', '#1874CD'], 'Platform')
         system_pie = vws.pie_chart(sys_data, st.SYSTEM_COLORS, 'System')
 
