@@ -1,10 +1,9 @@
-# import pandas as pd
 from collections import Counter
 from math import floor, log
 
 import getters
 import settings
-
+import requests
 
 # import numpy as np
 
@@ -12,7 +11,9 @@ import settings
 class Community:
     def __init__(self, group_id):
         self.group_id = group_id
+        self.vk_api = getters.auth()
         self.members_count, self.posts_count = self.counters()
+
         # self.posts, self.posts_count = getters.get_posts(group_id)
         # self.members, self.members_count = getters.get_members(group_id,fields='sex')
 
@@ -21,9 +22,8 @@ class Community:
         # cursor = conn.cursor()
 
     def counters(self):
-        vk_api = getters.auth()
-        members_count = vk_api.groups.getMembers(group_id=self.group_id).get('count', 0)
-        posts_count = vk_api.wall.get(domain=self.group_id)[0]
+        members_count = self.vk_api.groups.getMembers(group_id=self.group_id).get('count', 0)
+        posts_count = self.vk_api.wall.get(domain=self.group_id)[0]
         return members_count, posts_count
 
     def sex_data(self, debug=False):
@@ -117,9 +117,9 @@ class Community:
                     if age >= 80 or age < 10:
                         unknown += 1
                     else:
-                        if user['sex'] == 1:  # female
+                        if user['sex'] == 1:
                             ages_female.append(age)
-                        if user['sex'] == 2:  # male
+                        if user['sex'] == 2:
                             ages_male.append(age)
 
         # print(np.histogram(ages, bins='sturges'))
@@ -135,6 +135,111 @@ class Community:
         xbins_male = dict(start=age_male_min, end=age_male_max, size=hist_step)
         return ages_female, xbins_female, ages_male, xbins_male, unknown
 
+    def places_data(self, debug=False):
+        # info = getters.get_members(self.group_id, self.members_count, debug=debug, fields='country,city')
+        info = self.vk_api.groups.getMembers(group_id=self.group_id, sort='id_ask', fields='country,city')
+        info = info['users']
+
+        if debug:
+            print(info)
+
+        cities = []
+        countries = []
+
+        for each in info:
+            keys_city = 'city'
+            keys_country = 'country'
+            if keys_city in each.keys():
+                cities.append(each['city'])
+            if keys_country in each.keys():
+                countries.append(each['country'])
+
+        cities = dict(Counter(cities))
+        countries = dict(Counter(countries))
+
+        query = ''
+        for country_id in list(countries.keys()):
+            try:
+                str_country = settings.COUNTRIES[country_id]
+            except KeyError:
+                if not country_id:
+                    continue
+                query += str(country_id)
+                query += ','
+            else:
+                count = countries[country_id]
+                countries.pop(country_id)
+                countries.update({str_country: count})
+
+        query = query[:-1]
+        count = countries[0]
+        countries.pop(0)
+        countries.update({'Unknown': count})
+
+        if debug:
+            print(countries)
+
+        countries_names_id = self.vk_api.database.getCountriesById(country_ids=query)
+
+        if debug:
+            print(countries_names_id)
+
+        for country in countries_names_id:
+            cid = country['cid']
+            name = country['name']
+            count = countries[cid]
+            countries.pop(cid)
+            countries.update({name: count})
+
+        if debug:
+            print(countries)
+
+        ids = str(cities.keys()).replace('dict_keys([', '').replace('])', '')
+        city_names_id = self.vk_api.database.getCitiesById(city_ids=ids)
+
+        if debug:
+            print(city_names_id)
+
+        for city in city_names_id:
+            cid = city['cid']
+            name = city['name']
+            count = cities[cid]
+            cities.pop(cid)
+            cities.update({name: count})
+
+        count = cities[0]
+        cities.pop(0)
+        cities.update({'Unknown': count})
+
+        if debug:
+            print(cities)
+
+        names_of_keys = list(cities.keys())
+        names_of_keys.remove('Unknown')
+
+        for city in names_of_keys:
+            url = "https://maps.googleapis.com/maps/api/geocode/json?address="
+            url += city
+            url += "&key="
+            url += settings.GOOGLE_TOKEN
+            city_info = requests.get(url)
+
+            city_info = city_info.json()
+
+            lat = city_info['results'][0]['geometry']['location']['lat']
+
+            lng = city_info['results'][0]['geometry']['location']['lng']
+
+            count = cities[city]
+            cities.update({city: [(lat, lng), count]})
+
+        if debug:
+            print(cities)
+            print('\n')
+            print(countries)
+
+        return cities, countries
+
     def display(self):
         print("ID:" + str(self.group_id))
         print("Members:" + str(self.members_count))
@@ -142,8 +247,8 @@ class Community:
 
 
 if __name__ == "__main__":
-    pb = Community("sbertech")
-    # pb.age_data()
+    pb = Community("bmstu_ctf")
+    # pb.places_data(debug=False)
     # print(pb.platform_data())
     # print(pb.likes_data())
 

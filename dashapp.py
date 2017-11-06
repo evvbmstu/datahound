@@ -37,8 +37,6 @@ class CommunityAnalysisApp:
 
         plat_data, sys_data = self.public.platform_data()
 
-        print(plat_data.keys())
-
         platform_pie = vws.pie_chart(plat_data, ['#66CDAA', '#EE5C42', '#B22222', '#1874CD'], 'Platform')
         system_pie = vws.pie_chart(sys_data, st.SYSTEM_COLORS, 'System')
 
@@ -49,10 +47,10 @@ class CommunityAnalysisApp:
 
         max_age = max(xbins_female['end'], xbins_male['end'])
         step = xbins_female['size']
-        labels = ['{0}'.format(a) for a in range(0, max_age + step, step)]
+        labels = ['\t\t\t\t\t\t\t\t\t\t\t\t {0} - {1} \t\t\t\t\t\t\t\t\t\t\t\t '.format(a, a + step) for a in range(0, max_age + step, step)]
         values = [a for a in range(0, max_age + step, step)]
 
-        lay = vws.layout('Sex/Age', labels, values, 'Age ({0} Uknown)'.format(ukn), 'Percent')
+        lay = vws.layout('Sex/Age', labels, values, 'Age ({0} Uknown)'.format(ukn), 'Amount')
 
         fig_sex_age = vws.store_2_fig(gist_female, gist_male, lay)
 
@@ -79,7 +77,7 @@ class CommunityAnalysisApp:
         if self.debug:
             print("We draw this awesome graph, bro. Check it.")
 
-        self.app.run_server(debug=True)
+        self.app.run_server(debug=False)
 
 
 if __name__ == '__main__':

@@ -3,6 +3,13 @@ import unittest
 import mock
 
 from getters import auth
+from community import Community
+
+
+
+
+class TestCommunity(Community):
+    pass
 
 
 class ClientTestCase(unittest.TestCase):
@@ -63,8 +70,9 @@ class CommunityTestCase(unittest.TestCase):
         pass
 
     def age_data_test(self):
-        pass
+       pass
 
 
 if __name__ == '__main__':
     pass
+
