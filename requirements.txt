@@ -7,3 +7,4 @@ dash-html-components==0.8.0
 dash-core-components==0.14.0
 plotly==2.1.0
 ipython==6.2.0
+mock==2.0.0

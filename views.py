@@ -10,8 +10,8 @@ def pie_chart(data, colors, name):
 
 
 def histogram(data, xbins, colors, name):
-    return go.Histogram(x=data, histnorm='percent', xbins=xbins,
-                        marker=dict(color=colors, ), name=name,
+    return go.Histogram(x=data, xbins=xbins,
+                        marker=dict(color=colors), name=name,
                         opacity=0.75)
 
 
@@ -31,3 +31,8 @@ def funnel(phase, data):
     for each in phase:
         values.append(data[each])
     return funnelview.funnel_fig(values, phase)
+
+
+if __name__ == "__main__":
+    ex = histogram([1, 2, 3, 4, 5], {'end': 2, 'size': 3, 'start': 4}, ["#000000"], "example")
+    print(ex)
