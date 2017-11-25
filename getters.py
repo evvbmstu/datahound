@@ -71,5 +71,6 @@ def get_posts(group_id, wall_len, debug=False):
 
     return posts
 
+
 if __name__ == "__main__":
     auth()

@@ -4,8 +4,8 @@ from math import floor, log
 import getters
 import settings
 import requests
-
-# import numpy as np
+import exceptions as exc
+import time
 
 
 class Community:
@@ -15,17 +15,11 @@ class Community:
         self.vk_api = getters.auth()
         self.members_count, self.posts_count = self.counters()
 
-        # self.posts, self.posts_count = getters.get_posts(group_id)
-        # self.members, self.members_count = getters.get_members(group_id,fields='sex')
-
-    # def database_check(self):
-        # conn = MySQLdb.connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWD, MYSQL_DB, charset='utf8', use_unicode=True)
-        # cursor = conn.cursor()
-
     def counters(self):
         members_count = self.vk_api.groups.getMembers(group_id=self.group_id).get('count', 0)
         posts_count = self.vk_api.wall.get(domain=self.group_id)[0]
         return members_count, posts_count
+
 
     def ad_ratio(self):
         posts = getters.get_posts(self.group_id, self.posts_count)
@@ -117,7 +111,7 @@ class Community:
 
     def age_data(self, debug=False):
         age_data = getters.get_members(self.group_id, self.members_count, debug=debug, fields='sex, bdate')
-        year = 2017
+        year = time.gmtime(time.time()).tm_year
         unknown = 0
         ages_male = []
         ages_female = []
@@ -126,6 +120,7 @@ class Community:
             if date:
                 date = date.split('.')
                 if len(date) < 3:
+
                     unknown += 1
                     continue
                 else:
@@ -136,14 +131,24 @@ class Community:
                     else:
                         if user['sex'] == 1:
                             ages_female.append(age)
-                        if user['sex'] == 2:
+                        elif user['sex'] == 2:
                             ages_male.append(age)
+                        else:
+                            unknown += 1
+            else:
+                unknown += 1
 
-        # print(np.histogram(ages, bins='sturges'))
-        age_female_max = max(ages_female)
-        age_female_min = min(ages_female)
-        age_male_max = max(ages_male)
-        age_male_min = min(ages_female)
+        if ages_female:
+            age_female_max = max(ages_female)
+            age_female_min = min(ages_female)
+        else:
+            age_female_max, age_female_min = 0, 0
+
+        if ages_male:
+            age_male_max = max(ages_male)
+            age_male_min = min(ages_female)
+        else:
+            age_male_max, age_male_min = 0, 0
         age_num = len(ages_female) + len(ages_male)
 
         hist_step = 1 + floor(log(age_num, 2))
@@ -264,8 +269,14 @@ class Community:
 
 
 if __name__ == "__main__":
-    pb = Community("bmstu_ctf")
+    try:
+        pb = Community("bmstu_ctf")
+        print(pb.group_id.upper(), "\n\n")
+        print(pb.age_data())
+    except exc.VkAPIError:
+        print('Oops, get token, please')
+    # print(pb.members_count, pb.posts_count)
     # pb.places_data(debug=False)
-    # print(pb.platform_data())
+
     # print(pb.likes_data())
 
