@@ -9,6 +9,8 @@
 ### Example of settings.py (required)
 
 ```python
+import logging
+
 TOKEN = "" # your token here
 GOOGLE_TOKEN = ""   # your token here
 BASE_URL = "https://api.vk.com/method/execute."
@@ -30,6 +32,10 @@ COUNTRIES = {1: 'Россия',
              8: 'Израиль',
              9: 'США',
              10: 'Канада'}
+             
+logging.basicConfig(format='%(levelname)-8s [%(asctime)s] %(message)s',
+                    level=LOG_LEVEL, filename='datahound.log')
+                    
 ```
 :collision: To get your token please visit [Получение ключа доступа](https://vk.com/dev/access_token)
 
