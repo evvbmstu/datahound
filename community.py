@@ -6,10 +6,9 @@ import settings
 import requests
 import exceptions as exc
 import time
-
+import logging
 
 class Community:
-    
     def __init__(self, group_id):
         self.group_id = group_id
         self.vk_api = getters.auth()
@@ -19,7 +18,6 @@ class Community:
         members_count = self.vk_api.groups.getMembers(group_id=self.group_id).get('count', 0)
         posts_count = self.vk_api.wall.get(domain=self.group_id)[0]
         return members_count, posts_count
-
 
     def ad_ratio(self):
         posts = getters.get_posts(self.group_id, self.posts_count)
@@ -37,8 +35,8 @@ class Community:
         ad_data = {'marked as ad': ad, 'not ad': no_ad, 'unknown': unknown}
         return ad_data
 
-    def sex_data(self, debug=False):
-        sex_data = getters.get_members(self.group_id, self.members_count, debug=debug, fields="sex")
+    def sex_data(self):
+        sex_data = getters.get_members(self.group_id, self.members_count, fields="sex")
         woman = 0
         man = 0
         unknown = 0
@@ -52,7 +50,7 @@ class Community:
         sex_dict = {"Woman": woman, "Man": man, "Unknown": unknown}
         return sex_dict
 
-    def platform_data(self, debug=False):
+    def platform_data(self):
         platform_data = getters.get_members(self.group_id, self.members_count, fields="last_seen")
         platform_count = []
 
@@ -86,8 +84,8 @@ class Community:
 
         return platform_dict, system_dict
 
-    def likes_data(self, debug=False):
-        posts = getters.get_posts(self.group_id, self.posts_count, debug)
+    def likes_data(self):
+        posts = getters.get_posts(self.group_id, self.posts_count)
         views = 0
         likes = 0
         reposts = 0
@@ -109,8 +107,8 @@ class Community:
                         'Reposts': reposts, 'Reposts_past': reposts_past}
         return funnel_value
 
-    def age_data(self, debug=False):
-        age_data = getters.get_members(self.group_id, self.members_count, debug=debug, fields='sex, bdate')
+    def age_data(self):
+        age_data = getters.get_members(self.group_id, self.members_count, fields='sex, bdate')
         year = time.gmtime(time.time()).tm_year
         unknown = 0
         ages_male = []
@@ -157,13 +155,10 @@ class Community:
         xbins_male = dict(start=age_male_min, end=age_male_max, size=hist_step)
         return ages_female, xbins_female, ages_male, xbins_male, unknown
 
-    def places_data(self, debug=False):
+    def places_data(self):
         # info = getters.get_members(self.group_id, self.members_count, debug=debug, fields='country,city')
         info = self.vk_api.groups.getMembers(group_id=self.group_id, sort='id_ask', fields='country,city')
         info = info['users']
-
-        if debug:
-            print(info)
 
         cities = []
         countries = []
@@ -198,13 +193,7 @@ class Community:
         countries.pop(0)
         countries.update({'Unknown': count})
 
-        if debug:
-            print(countries)
-
         countries_names_id = self.vk_api.database.getCountriesById(country_ids=query)
-
-        if debug:
-            print(countries_names_id)
 
         for country in countries_names_id:
             cid = country['cid']
@@ -213,14 +202,8 @@ class Community:
             countries.pop(cid)
             countries.update({name: count})
 
-        if debug:
-            print(countries)
-
         ids = str(cities.keys()).replace('dict_keys([', '').replace('])', '')
         city_names_id = self.vk_api.database.getCitiesById(city_ids=ids)
-
-        if debug:
-            print(city_names_id)
 
         for city in city_names_id:
             cid = city['cid']
@@ -232,9 +215,6 @@ class Community:
         count = cities[0]
         cities.pop(0)
         cities.update({'Unknown': count})
-
-        if debug:
-            print(cities)
 
         names_of_keys = list(cities.keys())
         names_of_keys.remove('Unknown')
@@ -255,11 +235,6 @@ class Community:
             count = cities[city]
             cities.update({city: [(lat, lng), count]})
 
-        if debug:
-            print(cities)
-            print('\n')
-            print(countries)
-
         return cities, countries
 
     def display(self):
@@ -272,7 +247,7 @@ if __name__ == "__main__":
     try:
         pb = Community("bmstu_ctf")
         print(pb.group_id.upper(), "\n\n")
-        print(pb.age_data())
+        print(pb.places_data())
     except exc.VkAPIError:
         print('Oops, get token, please')
     # print(pb.members_count, pb.posts_count)
